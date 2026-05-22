@@ -243,27 +243,6 @@ export default function Login() {
         </div>
 
         {/* Demo Credentials */}
-        <div
-          style={{
-            marginTop: '24px',
-            padding: '16px',
-            background: 'rgba(91, 238, 197, 0.1)',
-            border: '1px solid rgba(91, 238, 197, 0.3)',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '0.8rem',
-            color: 'var(--text-muted)',
-          }}
-        >
-          <div style={{ fontWeight: '600', color: 'var(--mint)', marginBottom: '8px' }}>
-            Demo Accounts:
-          </div>
-          <div style={{ marginBottom: '4px' }}>
-            <strong>acc1:</strong> ash / 123
-          </div>
-          <div>
-            <strong>acc2:</strong> ash1 / 234
-          </div>
-        </div>
       </div>
     </div>
   );

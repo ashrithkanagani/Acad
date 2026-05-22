@@ -122,7 +122,7 @@ export default function PhotoToPdf() {
       formData.append("file", physicalFile);
 
       // 3. Send to MongoDB via Python
-      const response = await axios.post("http://localhost:8000/photos/", formData, {
+      const response = await axios.post("http://localhost:8000/files/", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
 

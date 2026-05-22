@@ -11,7 +11,7 @@ export default function Notes() {
   // Modal & Form State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingNote, setEditingNote] = useState(null);
-  const [formData, setFormData] = useState({ title: '', body: '', tag: 'Edit' });
+  const [formData, setFormData] = useState({ title: '', body: '', tag: 'Other' });
 
   const tagColors = {
     'OS': { color: 'var(--mint)', class: 'tag-os' },
@@ -19,7 +19,6 @@ export default function Notes() {
     'AI': { color: 'var(--periwinkle)', class: 'tag-ai' },
     'Maths': { color: 'var(--amber)', class: 'tag-math' },
     'DSA': { color: 'var(--sky)', class: 'tag-cs' },
-    'Edit': { color: 'var(--coral)', class: 'tag-other' },
     'Other': { color: 'var(--coral)', class: 'tag-other' }
   };
 
@@ -39,7 +38,7 @@ export default function Notes() {
     } else {
       setLoading(false);
     }
-  }, [currentUser]);
+  }, [currentUser, setNotes]);
 
   // 3. LOGIC & HANDLERS
   const filteredNotes = useMemo(() => {
@@ -49,21 +48,25 @@ export default function Notes() {
     );
   }, [notes, searchQuery]);
 
-  // Opens modal for both Creating (no args) and Editing (passing a note)
   const openModal = (note = null) => {
     if (note) {
       setEditingNote(note);
-      setFormData({ title: note.title, body: note.body, tag: note.tag });
+      // FIXED: Ensures standard fallbacks if note.tag does not match select fields
+      const fallbackTag = tagColors[note.tag] ? note.tag : 'Other';
+      setFormData({ title: note.title, body: note.body, tag: fallbackTag });
     } else {
       setEditingNote(null);
-      setFormData({ title: '', body: '', tag: 'Edit' });
+      setFormData({ title: '', body: '', tag: 'Other' });
     }
     setIsModalOpen(true);
   };
 
-  const closeModal = () => setIsModalOpen(false);
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingNote(null);
+    setFormData({ title: '', body: '', tag: 'Other' });
+  };
 
-  // Handles both Create (POST) and Edit (PUT)
   const handleSave = async (e) => {
     e.preventDefault();
     if (!formData.title.trim()) return;
@@ -102,7 +105,7 @@ export default function Notes() {
   };
 
   const handleDelete = async (id, e) => {
-    e.stopPropagation(); // Prevent the edit modal from opening when clicking delete
+    e.stopPropagation(); 
     try {
       await fetch(`http://localhost:8000/notes/${id}`, {
         method: 'DELETE'
@@ -113,7 +116,6 @@ export default function Notes() {
     }
   };
 
-  // 4. RENDER UI
   return (
     <div className="page active">
       <div className="page-topbar">
@@ -154,7 +156,7 @@ export default function Notes() {
                 key={note.id} 
                 className="note-card" 
                 style={{ '--note-color': styleProps.color }}
-                onClick={() => openModal(note)} // Clicking the card opens the edit modal
+                onClick={() => openModal(note)} 
               >
                 <div className="note-title">{note.title}</div>
                 <div className="note-body">{note.body}</div>
@@ -209,7 +211,6 @@ export default function Notes() {
                   <option value="AI">AI & ML</option>
                   <option value="Maths">Mathematics</option>
                   <option value="DSA">Data Structures</option>
-                  <option value="Edit">Edit</option>
                   <option value="Other">Other</option>
                 </select>
               </div>
