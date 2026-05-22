@@ -2,5 +2,8 @@ fastapi
 uvicorn
 pydantic
 python-dotenv
-google-genai
+pymongo
 motor
+python-multipart
+cloudinary
+google-genai
