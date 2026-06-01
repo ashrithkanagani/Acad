@@ -152,25 +152,26 @@ export default function PhotoToPdf() {
       const formData = new FormData();
       formData.append("username", username);
       formData.append("file", physicalFile);
+      
+      // Add the parent folder ID so the file is stored in the correct folder
+      const targetFolder = availableFolders.find(f => f.name === selectedFolder);
+      const targetFolderId = targetFolder ? targetFolder.id : 'root';
+      formData.append("parentId", targetFolderId);
 
       // 3. Send to MongoDB via Python
       const response = await axios.post(`${API_BASE_URL}/files/`, formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
 
-      // 4. Update your local React UI state so the folder system still works visually
-      const targetFolder = availableFolders.find(f => f.name === selectedFolder);
-      const targetFolderId = targetFolder ? targetFolder.id : 'root';
-      
+      // 4. Update your local React UI state with the backend response
       const newFile = {
-        id: response.data.id, // Use the real ID from MongoDB
+        id: response.data.id,
         type: 'file',
         icon: '🖼️',
-        name: fullFilename,
-        parentId: targetFolderId,
-        meta: (selectedImageData.length / 1024).toFixed(1) + ' KB',
-        url: selectedImageData, 
-        imageData: selectedImageData 
+        name: response.data.name || response.data.filename || fullFilename,
+        parentId: response.data.parentId || targetFolderId,
+        meta: response.data.file_size || `${(physicalFile.size / 1024).toFixed(2)} KB`,
+        url: response.data.url // Use the actual Cloudinary URL from backend
       };
       
       setFiles([...files, newFile]);
