@@ -201,7 +201,7 @@ export default function Dashboard() {
           <div className="feature-icon-wrap" style={{ padding: '6px' }}>
             <img src="/imageUpload.webp" alt="PDF Upload" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>
-          <div><div className="feature-name">Photo → PDF Upload</div><div className="feature-desc">Capture handwritten notes or lab sheets, convert to PDF, and save to cloud folders.</div></div>
+          <div><div className="feature-name">Photo Upload</div><div className="feature-desc">Capture handwritten notes or lab sheets, convert to PDF, and save to cloud folders.</div></div>
         </div>
 
         {/* 5. Reminder Scheduler */}

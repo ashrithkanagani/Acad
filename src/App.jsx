@@ -15,8 +15,13 @@ import Files from './pages/Files';
 import './assets/global.css';
 
 // Protected Route Component
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children, isLoading }) {
   const { user } = useAppContext(); // Changed from currentUser to user
+  
+  // While session is loading, don't render anything
+  if (isLoading) {
+    return null;
+  }
   
   if (!user) {
     return <Navigate to="/login" />;
@@ -24,6 +29,27 @@ function ProtectedRoute({ children }) {
   
   return children;
 }
+
+// Loading Screen Component
+function LoadingScreen() {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '100vh',
+      background: 'var(--bg)',
+      color: 'var(--text-muted)',
+      fontSize: '0.9rem'
+    }}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: '2rem', marginBottom: '16px' }}>⏳</div>
+        <div>Loading session...</div>
+      </div>
+    </div>
+  );
+}
+
 
 // Theme Provider Component
 function ThemedRouter({ children }) {
@@ -51,7 +77,12 @@ function ThemedRouter({ children }) {
 }
 
 function App() {
-  const { user, logout } = useAppContext(); // Changed from currentUser to user
+  const { user, isSessionLoading, logout } = useAppContext(); // Changed from currentUser to user
+
+  // Show loading screen while session is being restored
+  if (isSessionLoading) {
+    return <LoadingScreen />;
+  }
 
   // Validate session on app load and after page refresh
   useEffect(() => {
@@ -93,7 +124,7 @@ function App() {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute isLoading={isSessionLoading}>
                 <Layout>
                   <Dashboard />
                 </Layout>
@@ -104,7 +135,7 @@ function App() {
           <Route
             path="/notes"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute isLoading={isSessionLoading}>
                 <Layout>
                   <Notes />
                 </Layout>
@@ -115,7 +146,7 @@ function App() {
           <Route
             path="/timetable"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute isLoading={isSessionLoading}>
                 <Layout>
                   <Timetable />
                 </Layout>
@@ -126,7 +157,7 @@ function App() {
           <Route
             path="/assignments"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute isLoading={isSessionLoading}>
                 <Layout>
                   <Assignments />
                 </Layout>
@@ -137,7 +168,7 @@ function App() {
           <Route
             path="/files"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute isLoading={isSessionLoading}>
                 <Layout>
                   <Files />
                 </Layout>
@@ -148,7 +179,7 @@ function App() {
           <Route
             path="/pdf"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute isLoading={isSessionLoading}>
                 <Layout>
                   <PhotoToPdf />
                 </Layout>
@@ -159,7 +190,7 @@ function App() {
           <Route
             path="/reminders"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute isLoading={isSessionLoading}>
                 <Layout>
                   <Reminders />
                 </Layout>
@@ -170,17 +201,19 @@ function App() {
           <Route
             path="/settings"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute isLoading={isSessionLoading}>
                 <Layout>
                   <Settings />
                 </Layout>
               </ProtectedRoute>
             }
           />
+
+          {/* Catch-all: redirect to dashboard */}
+          <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
       </ThemedRouter>
     </Router>
   );
 }
-
 export default App;

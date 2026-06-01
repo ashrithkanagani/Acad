@@ -5,6 +5,7 @@ const AppContext = createContext();
 
 export function AppProvider({ children }) {
   // 1. AUTH STATE (Persistent via localStorage)
+  const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [user, setUser] = useState(() => {
     try {
       const savedSession = localStorage.getItem('acadweb_session');
@@ -25,6 +26,11 @@ export function AppProvider({ children }) {
     }
     return null;
   });
+  
+  // Mark session as loaded after initial render
+  useEffect(() => {
+    setIsSessionLoading(false);
+  }, []);
   
   // 2. LOCAL STATE (For features we haven't moved to the Python backend yet)
   const [notes, setNotes] = useState([]);
@@ -212,6 +218,7 @@ export function AppProvider({ children }) {
       setUser: login,
       setCurrentUser: login,
       logout,
+      isSessionLoading,
       
       // Temporary Local Data
       notes, setNotes,
