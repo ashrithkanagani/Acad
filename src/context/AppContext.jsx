@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { API_BASE_URL } from '../api';
 
 const AppContext = createContext();
 
@@ -74,7 +75,7 @@ export function AppProvider({ children }) {
       if (!user) return;
       try {
         const username = user.username ?? user.id;
-        const res = await fetch(`http://localhost:8000/files/${encodeURIComponent(username)}`);
+        const res = await fetch(`${API_BASE_URL}/files/${encodeURIComponent(username)}`);
         if (!res.ok) {
           const text = await res.text();
           throw new Error(`Files fetch failed: ${res.status} ${res.statusText} - ${text}`);
@@ -111,7 +112,7 @@ export function AppProvider({ children }) {
 
       try {
         const username = user.username ?? user.id;
-        const res = await fetch(`http://localhost:8000/reminders/${encodeURIComponent(username)}`);
+        const res = await fetch(`${API_BASE_URL}/reminders/${encodeURIComponent(username)}`);
         if (!res.ok) {
           console.error('Failed to load reminders', await res.text());
           return;
@@ -162,7 +163,7 @@ export function AppProvider({ children }) {
     try {
       const username = user.username ?? user.id;
       const payload = { username, ...reminder };
-      const res = await fetch('http://localhost:8000/reminders/', {
+      const res = await fetch(`${API_BASE_URL}/reminders/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -189,7 +190,7 @@ export function AppProvider({ children }) {
     }
 
     try {
-      const res = await fetch(`http://localhost:8000/reminders/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE_URL}/reminders/${encodeURIComponent(id)}`, { method: 'DELETE' });
       if (!res.ok) {
         const text = await res.text();
         throw new Error(`Delete failed: ${res.status} ${text}`);

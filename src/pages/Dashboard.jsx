@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../hooks/useAppContext';
 import { useEffect, useState, useMemo } from 'react';
+import { API_BASE_URL } from '../api';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -86,7 +87,7 @@ export default function Dashboard() {
     const fetchAssignments = async () => {
       if (!currentUser) return;
       try {
-        const res = await fetch(`http://localhost:8000/assignments/?user_id=${currentUser.id}`);
+        const res = await fetch(`${API_BASE_URL}/assignments/?user_id=${currentUser.id}`);
         if (res.ok) {
           const data = await res.json();
           setAssignments(Array.isArray(data) ? data : (Array.isArray(data?.assignments) ? data.assignments : []));

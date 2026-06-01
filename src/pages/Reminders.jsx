@@ -58,7 +58,7 @@ export default function Reminders() {
     if (editingReminder) {
       try {
         // Optimistic UI updates or direct PUT call depending on backend design 
-        const res = await fetch(`http://localhost:8000/reminders/${editingReminder.id}`, {
+const res = await fetch(`${API_BASE_URL}/reminders/${editingReminder.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)

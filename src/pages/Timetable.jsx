@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useAppContext } from '../hooks/useAppContext';
+import { API_BASE_URL } from '../api';
 
 export default function Timetable() {
   const { setTimetableData: setTimetableDataGlobal } = useAppContext();
@@ -79,7 +80,7 @@ export default function Timetable() {
     formData.append('file', uploadedFile);
 
     try {
-      const res = await fetch('http://127.0.0.1:8000/process-timetable', {
+      const res = await fetch(`${API_BASE_URL}/process-timetable`, {
         method: 'POST',
         body: formData
       });

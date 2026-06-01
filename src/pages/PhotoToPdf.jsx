@@ -1,10 +1,11 @@
 import { useState, useRef } from 'react';
 import { useAppContext } from '../hooks/useAppContext';
+import { API_BASE_URL } from '../api';
 import axios from 'axios'; // <-- ADDED AXIOS
 
 export default function PhotoToPdf() {
   // 1. GET GLOBAL STATE
-  const { files, setFiles } = useAppContext();
+  const { user, files, setFiles } = useAppContext();
   
   // Filter out ONLY the folders to show in the destination list
   const availableFolders = files.filter(f => f.type === 'folder');
@@ -104,7 +105,7 @@ export default function PhotoToPdf() {
 
     try {
       // Get the logged-in user
-      const username = localStorage.getItem("username");
+      const username = user?.username ?? user?.id;
       if (!username) {
         alert("Please log in to save files to the cloud.");
         setIsConverting(false);
@@ -122,7 +123,7 @@ export default function PhotoToPdf() {
       formData.append("file", physicalFile);
 
       // 3. Send to MongoDB via Python
-      const response = await axios.post("http://localhost:8000/files/", formData, {
+      const response = await axios.post(`${API_BASE_URL}/files/`, formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
 

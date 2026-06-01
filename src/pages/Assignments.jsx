@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
+import { API_BASE_URL } from '../api';
 import EmptyState from '../components/common/EmptyState';
 
 export default function Assignments() {
@@ -27,7 +28,7 @@ export default function Assignments() {
   useEffect(() => {
     if (user) {
       const userId = user.id || user.username;
-      fetch(`http://localhost:8000/assignments/?user_id=${userId}`)
+      fetch(`${API_BASE_URL}/assignments/?user_id=${userId}`)
         .then(res => res.json())
         .then(data => {
           setAssignments(Array.isArray(data) ? data : []);
@@ -50,7 +51,7 @@ export default function Assignments() {
     const updatedAssignment = { ...assignment, completed: !assignment.completed };
 
     try {
-      await fetch(`http://localhost:8000/assignments/${id}`, {
+      await fetch(`${API_BASE_URL}/assignments/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedAssignment)
@@ -84,7 +85,7 @@ export default function Assignments() {
 
   const deleteAssignment = async (id) => {
     try {
-      await fetch(`http://localhost:8000/assignments/${id}`, {
+      await fetch(`${API_BASE_URL}/assignments/${id}`, {
         method: 'DELETE'
       });
       setAssignments(assignments.filter(a => a.id !== id));
@@ -111,7 +112,7 @@ export default function Assignments() {
     try {
       if (editingId) {
         // Handle existing item edit pipeline update
-        const res = await fetch(`http://localhost:8000/assignments/${editingId}`, {
+        const res = await fetch(`${API_BASE_URL}/assignments/${editingId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -120,7 +121,7 @@ export default function Assignments() {
         setAssignments(assignments.map(a => a.id === editingId ? updated : a));
       } else {
         // Handle creation pipeline add
-        const res = await fetch('http://localhost:8000/assignments/', {
+        const res = await fetch(`${API_BASE_URL}/assignments/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)

@@ -1,6 +1,7 @@
 ﻿import { useState, useMemo, useEffect } from 'react';
 import EmptyState from '../components/common/EmptyState';
 import { useAppContext } from '../hooks/useAppContext';
+import { API_BASE_URL } from '../api';
 
 export default function Notes() {
   // 1. STATE MANAGEMENT
@@ -25,7 +26,7 @@ export default function Notes() {
   // 2. FETCH NOTES FROM BACKEND ON LOAD
   useEffect(() => {
     if (currentUser) {
-      fetch(`http://localhost:8000/notes/${currentUser.id}`)
+      fetch(`${API_BASE_URL}/notes/${currentUser.id}`)
         .then(res => res.json())
         .then(data => {
           setNotes(data);
@@ -82,7 +83,7 @@ export default function Notes() {
 
     try {
       if (editingNote) {
-        const res = await fetch(`http://localhost:8000/notes/${editingNote.id}`, {
+        const res = await fetch(`${API_BASE_URL}/notes/${editingNote.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(notePayload)
@@ -90,7 +91,7 @@ export default function Notes() {
         const updatedNote = await res.json();
         setNotes(notes.map(n => n.id === editingNote.id ? updatedNote : n));
       } else {
-        const res = await fetch('http://localhost:8000/notes/', {
+        const res = await fetch(`${API_BASE_URL}/notes/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(notePayload)
@@ -107,7 +108,7 @@ export default function Notes() {
   const handleDelete = async (id, e) => {
     e.stopPropagation(); 
     try {
-      await fetch(`http://localhost:8000/notes/${id}`, {
+      await fetch(`${API_BASE_URL}/notes/${id}`, {
         method: 'DELETE'
       });
       setNotes(notes.filter(n => n.id !== id));

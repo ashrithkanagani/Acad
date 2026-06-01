@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAppContext } from '../hooks/useAppContext';
+import { API_BASE_URL } from '../api';
 
 export default function Files() {
   const { user, files, setFiles } = useAppContext();
@@ -27,7 +28,7 @@ export default function Files() {
         formData.append("file", uploadedFile); 
 
         // SEND THE TRUCK (No headers needed, browser handles FormData automatically)
-        const res = await fetch('http://localhost:8000/files/', {
+        const res = await fetch(`${API_BASE_URL}/files/`, {
           method: 'POST',
           body: formData,
         });
@@ -76,7 +77,7 @@ export default function Files() {
     setFiles(files.filter(item => item.id !== id));
 
     try {
-      await fetch(`http://localhost:8000/files/${id}`, { method: 'DELETE' });
+      await fetch(`${API_BASE_URL}/files/${id}`, { method: 'DELETE' });
     } catch (err) {
       console.error("Failed to delete:", err);
     }
@@ -101,7 +102,7 @@ export default function Files() {
       if (!user) return;
 
       try {
-        const res = await fetch('http://localhost:8000/files/folder', {  
+        const res = await fetch(`${API_BASE_URL}/files/folder`, {  
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
