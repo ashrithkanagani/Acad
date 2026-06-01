@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: acadweb-app
+    runtime: python
+    buildCommand: |
+      pip install -r backend/requirements.txt && \
+      npm install && \
+      npm run build
+    startCommand: "cd backend && python main.py"
+    envVars:
+      - key: MONGO_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: VITE_API_BASE_URL
+        value: "https://acad-d1mk.onrender.com"
