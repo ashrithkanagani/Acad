@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAppContext } from '../hooks/useAppContext';
 import { API_BASE_URL } from '../api';
 import axios from 'axios'; // <-- ADDED AXIOS
@@ -25,6 +25,15 @@ export default function PhotoToPdf() {
   
   // Default to the first available folder if one exists
   const [selectedFolder, setSelectedFolder] = useState(() => availableFolders.length > 0 ? availableFolders[0].name : '');
+
+  // Cleanup camera on component unmount
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
 
   // --- NEW HELPER FUNCTION ---
   // This turns your camera's Base64 string back into a physical file for Python!
@@ -59,16 +68,38 @@ export default function PhotoToPdf() {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
+      // Set to active first so the video element renders
+      setIsCameraActive(true);
+      
+      // Request camera with better constraints
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: false
       });
+      
       streamRef.current = stream;
+      
+      // Wait a frame for the video element to be in the DOM
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        // Ensure autoplay
+        videoRef.current.play().catch(err => console.error('Auto-play failed:', err));
       }
-      setIsCameraActive(true);
     } catch (error) {
-      alert('Cannot access camera. Please check permissions.');
+      setIsCameraActive(false);
+      const errorMsg = error?.name === 'NotAllowedError' 
+        ? 'Camera access denied. Please allow camera permissions.'
+        : error?.name === 'NotFoundError'
+        ? 'No camera found. Check if your device has a camera.'
+        : 'Cannot access camera. Please check permissions.';
+      alert(errorMsg);
+      console.error('Camera error:', error);
     }
   };
 
@@ -221,8 +252,9 @@ export default function PhotoToPdf() {
               <video 
                 ref={videoRef}
                 autoPlay
+                muted
                 playsInline
-                style={{ width: '100%', height: '300px', display: 'block', objectFit: 'cover', backgroundColor: '#000' }}
+                style={{ width: '100%', height: '360px', display: 'block', objectFit: 'cover', backgroundColor: '#000', transform: 'scaleX(-1)' }}
               />
               <div style={{ display: 'flex', gap: '10px', padding: '16px', justifyContent: 'center' }}>
                 <button 
