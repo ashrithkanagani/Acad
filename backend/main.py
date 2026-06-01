@@ -172,23 +172,22 @@ def root():
 # Determine the path to the frontend dist folder
 DIST_PATH = Path(__file__).parent.parent / "dist"
 
-# Only mount static files if the dist folder exists
-if DIST_PATH.exists():
-    # Mount the static files
+# Mount the static files if they exist
+if (DIST_PATH / "assets").exists():
     app.mount("/assets", StaticFiles(directory=str(DIST_PATH / "assets")), name="assets")
+
+# Fallback route: serve index.html for all unmatched routes (enables SPA routing)
+@app.get("/{full_path:path}")
+async def serve_spa(full_path: str):
+    # Don't intercept actual API routes - those are handled by routers above
+    # Only return HTML for frontend routes
+    index_file = DIST_PATH / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
     
-    # Fallback route: serve index.html for all unmatched routes (enables SPA routing)
-    @app.get("/{full_path:path}")
-    async def serve_spa(full_path: str):
-        # Don't intercept API routes or actual files
-        if full_path.startswith("api/") or full_path.startswith("auth/"):
-            return {"error": "Not found"}, 404
-        
-        index_file = DIST_PATH / "index.html"
-        if index_file.exists():
-            return FileResponse(str(index_file))
-        
-        return {"error": "Frontend not built. Run 'npm run build' in the frontend directory."}, 404
+    # If dist doesn't exist, log and return error
+    print(f"ERROR: Frontend not built. DIST_PATH={DIST_PATH} exists={DIST_PATH.exists()}")
+    return {"error": "Frontend not built. Run 'npm run build' in the frontend directory."}, 404
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8000))

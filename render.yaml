@@ -3,10 +3,10 @@ services:
     name: acadweb-app
     runtime: python
     buildCommand: |
-      pip install -r backend/requirements.txt && \
       npm install && \
-      npm run build
-    startCommand: "cd backend && python main.py"
+      npm run build && \
+      pip install -r backend/requirements.txt
+    startCommand: "python backend/main.py"
     envVars:
       - key: MONGO_URL
         sync: false
